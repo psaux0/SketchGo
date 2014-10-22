@@ -1,11 +1,18 @@
+/*
+	A simple program encapsulated go/image library
+	Build drawing algortihms for it.
+*/
 package main
 
 import (
 	"image"
 	"image/color"
 	"image/png"
+	"image/jpeg"
 	"log"
 	"os"
+	"strings"
+	"fmt"
 )
 
 //in order to define new method for non-local struct
@@ -95,6 +102,29 @@ func NewImageToDraw(eX, eY int) (img *imgLocal){
 	return &imgLocal{*ig}
 }
 
+//Create a File
+func (img *imgLocal) GenerateImgFile(name string, imgFormat string) {
+	imgFormat = strings.ToLower(imgFormat)
+
+	imgFile, _ := os.Create(name + "." + imgFormat)
+	defer imgFile.Close()
+
+	//local stuct inherents *image.NRGBA's method
+	switch {
+	case imgFormat == "jpeg":
+		if err := jpeg.Encode(imgFile,img,nil); err != nil {
+			log.Fatal(err)
+		}
+	case imgFormat == "png":
+		if err := png.Encode(imgFile,img); err != nil {
+			log.Fatal(err)
+		}
+	default:
+		fmt.Println("Encode Format Error, Please use jpeg or png")
+		return
+	}
+}
+
 func main() {
 	//Edge length of the image
 	//Circle center, radius
@@ -112,12 +142,6 @@ func main() {
 	img.Circle(cX,cY,cRadius,color.RGBA{255,0,0,255})
 	img.Rectangel(30,30,60,90,color.RGBA{255,0,0,255})
 
-	imgFile, _ := os.Create("line.png")
-	defer imgFile.Close()
-
-	//local stuct inherents *image.NRGBA's method
-	err := png.Encode(imgFile,img)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//jpeg is not a good choice
+	img.GenerateImgFile("testpic","png")
 }
