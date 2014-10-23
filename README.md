@@ -27,7 +27,7 @@ func main() {
 	img.SetBackgroundColor(color.RGBA{0,255,0,255})
 	img.Line(0,0,edgeX,edgeY,color.RGBA{0,0,0,255})
 	img.Circle(cX,cY,cRadius,color.RGBA{255,0,0,255})
-	img.Rectangel(30,30,60,90,color.RGBA{255,0,0,255})
+	img.Rectangle(30,30,60,90,color.RGBA{255,0,0,255})
 
 	//jpeg is not a good choice
 	img.GenerateImgFile("testpic","png")
