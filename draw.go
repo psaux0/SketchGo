@@ -89,7 +89,7 @@ func (img *imgLocal) Circle(x0, y0, radius int, clr color.RGBA) {
 	}
 }
 
-func (img *imgLocal) Rectangel(x0, y0, x1, y1 int, clr color.RGBA) {
+func (img *imgLocal) Rectangle(x0, y0, x1, y1 int, clr color.RGBA) {
 	img.HorizentalLine(y0,x0,x1,clr)
 	img.HorizentalLine(y1,x0,x1,clr)
 	img.VerticalLine(x0,y0,y1,clr)
