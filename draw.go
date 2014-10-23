@@ -2,7 +2,7 @@
 	A simple program encapsulated go/image library
 	Build drawing algortihms for it.
 */
-package main
+package sketchgo
 
 import (
 	"image"
@@ -125,23 +125,3 @@ func (img *imgLocal) GenerateImgFile(name string, imgFormat string) {
 	}
 }
 
-func main() {
-	//Edge length of the image
-	//Circle center, radius
-	const (
-		edgeX = 255
-		edgeY = 255
-		cX = 10
-		cY = 10
-		cRadius = 40
-		)
-	//define local struct to implement method
-	img := NewImageToDraw(edgeX,edgeY)
-	img.SetBackgroundColor(color.RGBA{0,255,0,255})
-	img.Line(0,0,edgeX,edgeY,color.RGBA{0,0,0,255})
-	img.Circle(cX,cY,cRadius,color.RGBA{255,0,0,255})
-	img.Rectangel(30,30,60,90,color.RGBA{255,0,0,255})
-
-	//jpeg is not a good choice
-	img.GenerateImgFile("testpic","png")
-}
