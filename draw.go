@@ -41,6 +41,7 @@ func (img *imgLocal) SetBackgroundColor(clr color.RGBA) {
 			img.Set(x,y,clr)
 		}
 	}
+	img.fillColor = clr //fillColor if not set, should be the same as bg color
 }
 
 
