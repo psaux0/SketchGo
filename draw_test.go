@@ -3,6 +3,7 @@ package sketchgo
 import (
 	"testing"
 	"os"
+	"image/color"
 )
 
 func TestNewImageToDraw(t *testing.T) {
@@ -31,4 +32,12 @@ func TestGenerateImgFile(t *testing.T) {
 		t.Fail()
 	}
 
+}
+
+func TestcolorEqual(t *testing.T) {
+	b := colorEqual(color.NRGBA{1,1,1,255},color.RGBA{1,1,1,255})
+	if !b {
+		t.Log("colorequal fail")
+		t.Fail()
+	}
 }

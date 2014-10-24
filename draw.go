@@ -15,9 +15,24 @@ import (
 	"fmt"
 )
 
-//in order to define new method for non-local struct
+//in order to define new method for non-local struct, extend the struct too
+//can also be used for image.NRGBA functions because those functions only care about its elements
+//if it is defined as struct {ig image.NRGBA}. this is not a inherence, then it cannot be used
+//in those functions
 type imgLocal struct {
 	image.NRGBA
+	toFill bool
+	fillColor color.RGBA
+}
+
+type fillColor struct {
+	toFill bool
+	colorFill color.RGBA
+}
+
+type pixel struct {
+	X int
+	Y int
 }
 
 func (img *imgLocal) SetBackgroundColor(clr color.RGBA) {
@@ -87,6 +102,19 @@ func (img *imgLocal) Circle(x0, y0, radius int, clr color.RGBA) {
 			radiusError += 2 * (y - x + 1)
 		}
 	}
+	if img.toFill {
+		floodFill(x0,y0,clr,img.fillColor,img)
+	}
+}
+
+func (img *imgLocal) Fill(clr color.RGBA) {
+	img.toFill = true
+	img.fillColor = clr
+}
+
+func (img *imgLocal) FillClear() {
+	img.toFill = false
+	img.fillColor = color.RGBA{255,255,255,255}
 }
 
 func (img *imgLocal) Rectangle(x0, y0, x1, y1 int, clr color.RGBA) {
@@ -94,12 +122,21 @@ func (img *imgLocal) Rectangle(x0, y0, x1, y1 int, clr color.RGBA) {
 	img.HorizentalLine(y1,x0,x1,clr)
 	img.VerticalLine(x0,y0,y1,clr)
 	img.VerticalLine(x1,y0,y1,clr)
+	if img.toFill {
+		midX := (x0 + x1) >> 1
+		midY := (y0 + y1) >> 1
+		floodFill(midX, midY, clr, img.fillColor, img)
+	}
 }
 
 //Initiate a img data structure
 func NewImageToDraw(eX, eY int) (img *imgLocal){
 	ig := image.NewNRGBA(image.Rect(0,0,eX,eY))
-	return &imgLocal{*ig}
+	return &imgLocal{
+		*ig,
+		true,
+		color.RGBA{255,255,255,255},
+	}
 }
 
 //Create a File
@@ -122,6 +159,39 @@ func (img *imgLocal) GenerateImgFile(name string, imgFormat string) {
 	default:
 		fmt.Println("Encode Format Error, Please use jpeg or png")
 		return
+	}
+}
+
+//If two types of color equal to each other
+func colorEqual(cx color.NRGBA, cy color.RGBA) bool {
+	if cx.R == cy.R && cx.G == cy.G && cx.B == cy.B && cx.A == cy.A {
+		return true
+	} else {
+		return false
+	}
+}
+
+
+//FloodFill ALgorithm fill in color
+//Bug is two shapes are overlapped and share same color edge, only part of the shape will be dyed
+func floodFill(x, y int, edgeColor color.RGBA, fColor color.RGBA, img *imgLocal) {
+	dx := []int{1,0,-1,0}
+	dy := []int{0,1,0,-1}
+	var deque *Deque = NewDeque()
+	deque.Append(pixel{x,y})
+	img.Set(x,y,fColor)
+	for !deque.Empty() {
+		p := deque.First().(pixel)
+		deque.Shift()
+		for i := 0; i < 4; i++ {
+			nx := p.X + dx[i]
+			ny := p.Y + dy[i]
+			pColor := img.At(nx,ny).(color.NRGBA)
+			if !(colorEqual(pColor, edgeColor) || colorEqual(pColor,fColor)){
+				deque.Append(pixel{nx,ny})
+				img.Set(nx,ny,fColor)
+			}
+		}
 	}
 }
 
